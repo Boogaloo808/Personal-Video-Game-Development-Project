@@ -43,8 +43,8 @@ public class PlayerController : MonoBehaviour
         
         Vector3 temp = myRB.velocity;
 
-        temp.x = Input.GetAxisRaw("Horizontal") * speed;
-        temp.z = Input.GetAxisRaw("Vertical") * speed;
+        temp.x = Input.GetAxisRaw("Horizontal") * speed * 5;
+        temp.z = Input.GetAxisRaw("Vertical") * speed *5;
 
         if (Input.GetKeyDown(KeyCode.Space))
             temp.y = jumpheight;
