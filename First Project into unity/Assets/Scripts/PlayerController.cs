@@ -9,46 +9,107 @@ public class PlayerController : MonoBehaviour
 
     Vector2 camRotation;
 
-    public float speed = 10f;
-    public float jumpheight = 5f;
+    [Header("Player Stats")]
+    public int health = 5;
+    public int maxHealth = 10;
+    public int healthPickupAmt = 5;
 
+    [Header("Weapon Stats")]
+    public Transform weaponSlot;
+
+    [Header("Movement Stats")]
+    public bool sprinting = false;
+    public float speed = 10f;
+    public float sprintMult = 1.5f;
+    public float jumpHeight = 5f;
+    public float groundDetection = 1f;
+
+    [Header("User Settings")]
+    public bool sprintToggle = false;
     public float mouseSensitivity = 2.0f;
     public float Xsensitivity = 2.0f;
     public float Ysensitivity = 2.0f;
-
-    public float camRotationlimit = 90f;
+    public float camRotationLimit = 90f;
 
     // Start is called before the first frame update
     void Start()
     {
+        // Initialized components
         myRB = GetComponent<Rigidbody>();
         playerCam = transform.GetChild(0).GetComponent<Camera>();
 
+        // Camera setup
         camRotation = Vector2.zero;
         Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.lockState = CursorLockMode.Locked;
+
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        // FPS Camera Rotation
         camRotation.x += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
         camRotation.y += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
 
-        camRotation.y = Mathf.Clamp(camRotation.y, -90, 90);
+        // Limit vertical rotation
+        camRotation.y = Mathf.Clamp(camRotation.y, -camRotationLimit, camRotationLimit);
 
+        // Set camera rotation on the vertical axis | Set player rotation on horizontal axis
         playerCam.transform.localRotation = Quaternion.AngleAxis(camRotation.y, Vector3.left);
         transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
-        
+
+
+        // Sprint turn on for toggle & not toggle
+        if ((!sprinting) && ((!sprintToggle && Input.GetKey(KeyCode.LeftShift)) || (sprintToggle && Input.GetKey(KeyCode.LeftShift) && (Input.GetAxisRaw("Vertical") > 0))))
+            sprinting = true;
+
+
+        // Movement math calculation velocity measured by input * speed
         Vector3 temp = myRB.velocity;
 
-        temp.x = Input.GetAxisRaw("Horizontal") * speed * 5;
-        temp.z = Input.GetAxisRaw("Vertical") * speed *5;
+        temp.x = Input.GetAxisRaw("Horizontal") * speed;
+        temp.z = Input.GetAxisRaw("Vertical") * speed;
 
-        if (Input.GetKeyDown(KeyCode.Space))
-            temp.y = jumpheight;
+        // If sprinting, check to see if disable condition flags (also amplify speed if sprinting)
+        if (sprinting)
+        {
+            temp.z *= sprintMult;
 
+            if ((sprintToggle && (Input.GetAxisRaw("Vertical") <= 0)) || (!sprintToggle && Input.GetKeyUp(KeyCode.LeftShift)))
+                sprinting = false;
+        }
+
+        // Jump
+        if (Input.GetKeyDown(KeyCode.Space) && Physics.Raycast(transform.position, -transform.up, groundDetection))
+            temp.y = jumpHeight;
+
+        // Give calculated velocity back to rigidbody
         myRB.velocity = (transform.forward * temp.z) + (transform.right * temp.x) + (transform.up * temp.y);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if ((collision.gameObject.tag == "healthPickup") && health < maxHealth)
+        {
+            if (health + healthPickupAmt > maxHealth)
+                health = maxHealth;
+
+            else
+                health += healthPickupAmt;
+
+            Destroy(collision.gameObject);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "weapon")
+        {
+            other.transform.position = weaponSlot.position;
+            other.transform.rotation = weaponSlot.rotation;
+
+            other.transform.SetParent(weaponSlot);
+        }
     }
 }
