@@ -158,7 +158,8 @@ MonoBehaviour:
   weaponSlot: {fileID: 5136266619447594655}
   canFire: 1
   fireRate: 0
-  shot: {fileID: 8524444316840429687, guid: 911444c984017ec46a27c2e2c11a2063, type: 3}
+  shot: {fileID: 3008029583691102779, guid: 24085e46c5ccee7459beb0aba12a4289, type: 3}
+  buckshot: {fileID: 8368139629812578031, guid: 9db6ea82d42acb64eb6c4eecafcb7e8d, type: 3}
   shotVel: 0
   weaponID: -1
   fireMode: 0
@@ -168,6 +169,8 @@ MonoBehaviour:
   reloadAmt: 0
   bulletLifespan: 0
   currentAmmo: 0
+  numShots: 0
+  spreadAngle: 0
   sprinting: 0
   speed: 10
   sprintMult: 1.5

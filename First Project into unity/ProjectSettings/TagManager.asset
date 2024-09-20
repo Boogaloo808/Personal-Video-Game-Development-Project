@@ -7,6 +7,9 @@ TagManager:
   - weapon
   - healthPickup
   - bullet
+  - buck shot
+  - weapon1
+  - weapon2
   layers:
   - Default
   - TransparentFX

@@ -16,9 +16,12 @@ public class PlayerController : MonoBehaviour
 
     [Header("Weapon Stats")]
     public Transform weaponSlot;
+    public Transform weapon1;
+    public Transform weapon2;
     public bool canFire = true;
     public float fireRate = 0;
     public GameObject shot;
+    public GameObject buckshot;
     public float shotVel = 0;
     public int weaponID = -1;
     public int fireMode = 0;
@@ -73,9 +76,13 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
         {
-            GameObject s = Instantiate(shot, weaponSlot.position, weaponSlot.rotation);
+            GameObject s = Instantiate(shot, weapon1.position, weapon1.rotation);
             s.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
             Destroy(s, bulletLifespan);
+
+            GameObject n = Instantiate(buckshot, weapon2.position, weapon2.rotation);
+            n.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
+            Destroy(n, bulletLifespan);
 
             canFire = false;
             currentClip--;
@@ -142,36 +149,67 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "weapon")
+        if(other.gameObject.tag == "weapon" && Input.GetKeyDown(KeyCode.E))
         {
-            other.transform.position = weaponSlot.position;
-            other.transform.rotation = weaponSlot.rotation;
-
-            other.transform.SetParent(weaponSlot);
-
-
-            switch(other.gameObject.name)
-            {
-                case "weapon1":
-                    weaponID = 0;
-                    shotVel = 10000;
-                    fireMode = 0;
-                    fireRate = 0.1f;
-                    currentClip = 20;
-                    clipSize = 20;
-                    maxAmmo = 400;
-                    currentAmmo = 200;
-                    reloadAmt = 20;
-                    bulletLifespan = .5f;
-                    break;
-
-                default:
-                    break;
-            }
+            weaponEquip(other.gameObject);
         }
     }
-    
-        public void reloadClip()
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "weapon" && Input.GetKeyDown(KeyCode.E))
+        {
+            weaponEquip(other.gameObject);
+        }
+    }
+
+    public void weaponEquip(GameObject weapon)
+    {
+        if(weaponSlot.childCount > 0)
+        {
+            // De-child object from weapon slot (make it an independent object again)
+            // Drop weapon away from player
+        }
+
+        weapon.transform.position = weaponSlot.position;
+        weapon.transform.rotation = weaponSlot.rotation;
+
+        weapon.transform.SetParent(weaponSlot);
+
+
+        switch (weapon.gameObject.name)
+        {
+            case "weapon1":
+                weaponID = 0;
+                shotVel = 2500;
+                fireMode = 9;
+                fireRate = 0.5f;
+                currentClip = 20;
+                clipSize = 20;
+                maxAmmo = 400;
+                currentAmmo = 200;
+                reloadAmt = 20;
+                bulletLifespan = .5f;
+                break;
+            case "weapon2":
+                weaponID = 1;
+                shotVel = 2500;
+                fireMode = 0;
+                fireRate = 0.5f;
+                currentClip = 20;
+                clipSize = 20;
+                maxAmmo = 400;
+                currentAmmo = 200;
+                reloadAmt = 20;
+                bulletLifespan = .5f;
+                break;
+
+
+            default:
+                break;
+        }
+    }
+public void reloadClip()
         {
             if (currentClip >= clipSize)
                 return;
