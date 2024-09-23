@@ -74,12 +74,20 @@ public class PlayerController : MonoBehaviour
         playerCam.transform.localRotation = Quaternion.AngleAxis(camRotation.y, Vector3.left);
         transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
 
+       
         if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
         {
             GameObject s = Instantiate(shot, weapon1.position, weapon1.rotation);
             s.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
             Destroy(s, bulletLifespan);
 
+            canFire = false;
+            currentClip--;
+            StartCoroutine("cooldownFire");
+        }
+
+        if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 1)
+        {
             GameObject n = Instantiate(buckshot, weapon2.position, weapon2.rotation);
             n.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
             Destroy(n, bulletLifespan);

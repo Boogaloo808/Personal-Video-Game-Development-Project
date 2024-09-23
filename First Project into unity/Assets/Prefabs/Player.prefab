@@ -156,6 +156,8 @@ MonoBehaviour:
   maxHealth: 10
   healthPickupAmt: 5
   weaponSlot: {fileID: 5136266619447594655}
+  weapon1: {fileID: 0}
+  weapon2: {fileID: 0}
   canFire: 1
   fireRate: 0
   shot: {fileID: 3008029583691102779, guid: 24085e46c5ccee7459beb0aba12a4289, type: 3}
@@ -169,8 +171,6 @@ MonoBehaviour:
   reloadAmt: 0
   bulletLifespan: 0
   currentAmmo: 0
-  numShots: 0
-  spreadAngle: 0
   sprinting: 0
   speed: 10
   sprintMult: 1.5
