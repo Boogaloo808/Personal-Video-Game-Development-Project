@@ -10,6 +10,7 @@ TagManager:
   - buck shot
   - weapon1
   - weapon2
+  - basicEnemy
   layers:
   - Default
   - TransparentFX

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,27 +11,27 @@ public class PlayerController : MonoBehaviour
     Vector2 camRotation;
 
     [Header("Player Stats")]
+    public bool takenDamage = false;
+    public float damangeCooldownTimer = .5f;
     public int health = 5;
     public int maxHealth = 10;
-    public int healthPickupAmt = 5;
+    public int healtPickupAmt = 5;
 
     [Header("Weapon Stats")]
     public Transform weaponSlot;
-    public Transform weapon1;
-    public Transform weapon2;
-    public bool canFire = true;
-    public float fireRate = 0;
     public GameObject shot;
-    public GameObject buckshot;
     public float shotVel = 0;
     public int weaponID = -1;
     public int fireMode = 0;
+    public float fireRate = 0;
     public float currentClip = 0;
     public float clipSize = 0;
     public float maxAmmo = 0;
+    public float currentAmmo = 0;
     public float reloadAmt = 0;
     public float bulletLifespan = 0;
-    public float currentAmmo = 0;
+    public bool canFire = true;
+
 
     [Header("Movement Stats")]
     public bool sprinting = false;
@@ -57,12 +58,14 @@ public class PlayerController : MonoBehaviour
         camRotation = Vector2.zero;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (health <= 0)
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
         // FPS Camera Rotation
         camRotation.x += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
         camRotation.y += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
@@ -74,23 +77,11 @@ public class PlayerController : MonoBehaviour
         playerCam.transform.localRotation = Quaternion.AngleAxis(camRotation.y, Vector3.left);
         transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
 
-       
         if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
         {
-            GameObject s = Instantiate(shot, weapon1.position, weapon1.rotation);
+            GameObject s = Instantiate(shot, weaponSlot.position, weaponSlot.rotation);
             s.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
             Destroy(s, bulletLifespan);
-
-            canFire = false;
-            currentClip--;
-            StartCoroutine("cooldownFire");
-        }
-
-        if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 1)
-        {
-            GameObject n = Instantiate(buckshot, weapon2.position, weapon2.rotation);
-            n.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
-            Destroy(n, bulletLifespan);
 
             canFire = false;
             currentClip--;
@@ -133,118 +124,90 @@ public class PlayerController : MonoBehaviour
     {
         if ((collision.gameObject.tag == "healthPickup") && health < maxHealth)
         {
-            if (health + healthPickupAmt > maxHealth)
+            if (health + healtPickupAmt > maxHealth)
                 health = maxHealth;
 
             else
-                health += healthPickupAmt;
+                health += healtPickupAmt;
 
             Destroy(collision.gameObject);
         }
 
-            if ((collision.gameObject.tag == "ammoPickup") && currentAmmo < maxAmmo)
-            {
-                if (currentAmmo + reloadAmt > maxAmmo)
-                    currentAmmo = maxAmmo;
+        if ((collision.gameObject.tag == "ammoPickup") && currentAmmo < maxAmmo)
+        {
+            if (currentAmmo + reloadAmt > maxAmmo)
+                currentAmmo = maxAmmo;
 
-                else
-                    currentAmmo += reloadAmt;
+            else
+                currentAmmo += reloadAmt;
 
-                Destroy(collision.gameObject);
-            }
-        
+            Destroy(collision.gameObject);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "weapon" && Input.GetKeyDown(KeyCode.E))
+        if (other.gameObject.tag == "weapon")
         {
-            weaponEquip(other.gameObject);
+            other.transform.SetPositionAndRotation(weaponSlot.position, weaponSlot.rotation);
+
+            other.transform.SetParent(weaponSlot);
+
+            switch (other.gameObject.name)
+            {
+                case "weapon1":
+                    weaponID = 0;
+                    shotVel = 10000;
+                    fireMode = 0;
+                    fireRate = 0.1f;
+                    currentClip = 20;
+                    clipSize = 20;
+                    maxAmmo = 400;
+                    currentAmmo = 200;
+                    reloadAmt = 20;
+                    bulletLifespan = .5f;
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 
-    private void OnTriggerStay(Collider other)
+    public void reloadClip()
     {
-        if (other.gameObject.tag == "weapon" && Input.GetKeyDown(KeyCode.E))
+        if (currentClip >= clipSize)
+            return;
+
+        else
         {
-            weaponEquip(other.gameObject);
-        }
-    }
+            float reloadCount = clipSize - currentClip;
 
-    public void weaponEquip(GameObject weapon)
-    {
-        if(weaponSlot.childCount > 0)
-        {
-            // De-child object from weapon slot (make it an independent object again)
-            // Drop weapon away from player
-        }
-
-        weapon.transform.position = weaponSlot.position;
-        weapon.transform.rotation = weaponSlot.rotation;
-
-        weapon.transform.SetParent(weaponSlot);
-
-
-        switch (weapon.gameObject.name)
-        {
-            case "weapon1":
-                weaponID = 0;
-                shotVel = 2500;
-                fireMode = 9;
-                fireRate = 0.5f;
-                currentClip = 20;
-                clipSize = 20;
-                maxAmmo = 400;
-                currentAmmo = 200;
-                reloadAmt = 20;
-                bulletLifespan = .5f;
-                break;
-            case "weapon2":
-                weaponID = 1;
-                shotVel = 2500;
-                fireMode = 0;
-                fireRate = 0.5f;
-                currentClip = 20;
-                clipSize = 20;
-                maxAmmo = 400;
-                currentAmmo = 200;
-                reloadAmt = 20;
-                bulletLifespan = .5f;
-                break;
-
-
-            default:
-                break;
-        }
-    }
-public void reloadClip()
-        {
-            if (currentClip >= clipSize)
+            if (currentAmmo < reloadCount)
+            {
+                currentClip += currentAmmo;
+                currentAmmo = 0;
                 return;
+            }
 
             else
             {
-                float reloadCount = clipSize - currentClip;
-
-                if (currentAmmo < reloadCount)
-                {
-                    currentClip += currentAmmo;
-                    currentAmmo = 0;
-                    return;
-                }
-
-                else
-                {
-                    currentClip += reloadCount;
-                    currentAmmo -= reloadCount;
-                    return;
-                }
+                currentClip += reloadCount;
+                currentAmmo -= reloadCount;
+                return;
             }
         }
+    }
 
     IEnumerator cooldownFire()
     {
         yield return new WaitForSeconds(fireRate);
         canFire = true;
+    }
+
+    public IEnumerator cooldownDamage()
+    {
+        yield return new WaitForSeconds(damangeCooldownTimer);
+        takenDamage = false;
     }
 }
