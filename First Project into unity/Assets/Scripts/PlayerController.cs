@@ -6,7 +6,9 @@ using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     Rigidbody myRB;
-    Camera playerCam;
+    public Camera playerCam;
+
+    public Transform cameraHolder;
 
     Vector2 camRotation;
 
@@ -16,6 +18,9 @@ public class PlayerController : MonoBehaviour
     public int health = 5;
     public int maxHealth = 10;
     public int healtPickupAmt = 5;
+
+    [Header("Upgrade1 Stats")]
+    public Transform upgrade1Slot;
 
     [Header("Weapon Stats")]
     public Transform weaponSlot;
@@ -52,7 +57,8 @@ public class PlayerController : MonoBehaviour
     {
         // Initialized components
         myRB = GetComponent<Rigidbody>();
-        playerCam = transform.GetChild(0).GetComponent<Camera>();
+        //playerCam = Camera.main;
+        cameraHolder = transform.GetChild(0);
 
         // Camera setup
         camRotation = Vector2.zero;
@@ -73,8 +79,10 @@ public class PlayerController : MonoBehaviour
         // Limit vertical rotation
         camRotation.y = Mathf.Clamp(camRotation.y, -camRotationLimit, camRotationLimit);
 
+        playerCam.transform.position = cameraHolder.position;
+
         // Set camera rotation on the vertical axis | Set player rotation on horizontal axis
-        playerCam.transform.localRotation = Quaternion.AngleAxis(camRotation.y, Vector3.left);
+        playerCam.transform.rotation = Quaternion.Euler(-camRotation.y, camRotation.x, 0);
         transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
 
         if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
@@ -157,9 +165,9 @@ public class PlayerController : MonoBehaviour
             {
                 case "weapon1":
                     weaponID = 0;
-                    shotVel = 10000;
+                    shotVel = 5000;
                     fireMode = 0;
-                    fireRate = 0.1f;
+                    fireRate = 0.3f;
                     currentClip = 20;
                     clipSize = 20;
                     maxAmmo = 400;
@@ -169,6 +177,17 @@ public class PlayerController : MonoBehaviour
                     break;
 
                 default:
+                case "upgrade":
+                    weaponID = 1;
+                    shotVel = 8000;
+                    fireMode = 0;
+                    fireRate = 0.1f;
+                    currentClip = 20;
+                    clipSize = 20;
+                    maxAmmo = 400;
+                    currentAmmo = 200;
+                    reloadAmt = 20;
+                    bulletLifespan = .5f;
                     break;
             }
         }
