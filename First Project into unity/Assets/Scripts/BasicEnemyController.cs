@@ -17,6 +17,12 @@ public class BasicEnemyController : MonoBehaviour
     public int damageReceived = 1;
     public float pushBackForce = 5;
 
+    [Header("Movement Stats")]
+    public bool sprinting = false;
+    public float speed = 10f;
+    public float sprintMult = 1.5f;
+    public float jumpHeight = 5f;
+    public float groundDetection = 1f;
 
     // Start is called before the first frame update
     void Start()
