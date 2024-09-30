@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class BasicEnemyController : MonoBehaviour
 {
+    public Camera enemyCam;
     public PlayerController player;
     public NavMeshAgent agent;
     public Transform target;
@@ -34,10 +35,6 @@ public class BasicEnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        target = GameObject.Find("Player").transform;
-
-        agent.destination = target.position;
-
         if (health <= 0)
             Destroy(gameObject);
     }
@@ -49,7 +46,7 @@ public class BasicEnemyController : MonoBehaviour
             health -= damageReceived;
             Destroy(collision.gameObject);
         }
-
+        
         if (collision.gameObject.tag == "Player" && !player.takenDamage)
         {
             player.takenDamage = true;
@@ -58,4 +55,15 @@ public class BasicEnemyController : MonoBehaviour
             player.StartCoroutine("cooldownDamage");
         }
     }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            target = GameObject.Find("Player").transform;
+
+            agent.destination = target.position;
+        }
+    }
+    
 }

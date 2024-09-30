@@ -12,6 +12,7 @@ TagManager:
   - weapon2
   - basicEnemy
   - Upgrade
+  - enemyCam
   layers:
   - Default
   - TransparentFX
