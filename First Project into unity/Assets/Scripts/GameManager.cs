@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public bool isPaused = false;
     public GameObject pauseMenu;
+    public GameObject crosshair;
     public PlayerController playerData;
     public Image healthBar;
     public TextMeshProUGUI clipCounter;
@@ -29,9 +30,10 @@ public class GameManager : MonoBehaviour
         else
         {
             clipCounter.gameObject.SetActive(true);
-            clipCounter.text = "Clip: " + playerData.currentClip + "/" + playerData.clipSize;
+            clipCounter.text = " " + playerData.currentClip + "/" + playerData.clipSize;
             ammoCounter.gameObject.SetActive(true);
-            ammoCounter.text = "Ammo: " + playerData.currentAmmo;
+            ammoCounter.text = " " + playerData.currentAmmo;
+            crosshair.SetActive(true);
         }
         if (!isPaused && Input.GetKeyDown(KeyCode.Escape))
         {
