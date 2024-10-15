@@ -8,9 +8,9 @@ public class PlayerController : MonoBehaviour
     GameManager gm;
 
     Rigidbody myRB;
-    public Camera playerCam;
+    Camera playerCam;
 
-    public Transform cameraHolder;
+    Transform cameraHolder;
 
     Vector2 camRotation;
 
@@ -21,10 +21,8 @@ public class PlayerController : MonoBehaviour
     public int maxHealth = 10;
     public int healtPickupAmt = 5;
 
-    [Header("Upgrade1 Stats")]
-    public Transform upgrade1Slot;
-
     [Header("Weapon Stats")]
+    public AudioSource weaponSpeaker;
     public Transform weaponSlot;
     public GameObject shot;
     public float shotVel = 0;
@@ -60,7 +58,7 @@ public class PlayerController : MonoBehaviour
         // Initialized components
         gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         myRB = GetComponent<Rigidbody>();
-        //playerCam = Camera.main;
+        playerCam = Camera.main;
         cameraHolder = transform.GetChild(0);
 
         // Camera setup
@@ -92,6 +90,7 @@ public class PlayerController : MonoBehaviour
 
             if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
             {
+                weaponSpeaker.Play();
                 GameObject s = Instantiate(shot, weaponSlot.position, weaponSlot.rotation);
                 s.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
                 Destroy(s, bulletLifespan);
@@ -131,7 +130,8 @@ public class PlayerController : MonoBehaviour
 
             // Give calculated velocity back to rigidbody
             myRB.velocity = (transform.forward * temp.z) + (transform.right * temp.x) + (transform.up * temp.y);
-        } 
+
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -157,11 +157,6 @@ public class PlayerController : MonoBehaviour
 
             Destroy(collision.gameObject);
         }
-
-        if (collision.gameObject.tag == "bullet")
-        {
-            Destroy(collision.gameObject);
-        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -172,13 +167,15 @@ public class PlayerController : MonoBehaviour
 
             other.transform.SetParent(weaponSlot);
 
+            weaponSpeaker = other.gameObject.GetComponent<AudioSource>();
+
             switch (other.gameObject.name)
             {
                 case "weapon1":
                     weaponID = 0;
-                    shotVel = 5000;
+                    shotVel = 10000;
                     fireMode = 0;
-                    fireRate = 0.3f;
+                    fireRate = 0.1f;
                     currentClip = 20;
                     clipSize = 20;
                     maxAmmo = 400;
@@ -188,17 +185,6 @@ public class PlayerController : MonoBehaviour
                     break;
 
                 default:
-                case "upgrade":
-                    weaponID = 1;
-                    shotVel = 8000;
-                    fireMode = 0;
-                    fireRate = 0.1f;
-                    currentClip = 20;
-                    clipSize = 20;
-                    maxAmmo = 400;
-                    currentAmmo = 200;
-                    reloadAmt = 20;
-                    bulletLifespan = .5f;
                     break;
             }
         }
