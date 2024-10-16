@@ -8,9 +8,9 @@ public class PlayerController : MonoBehaviour
     GameManager gm;
 
     Rigidbody myRB;
-    Camera playerCam;
+    public Camera playerCam;
 
-    Transform cameraHolder;
+    public Transform cameraHolder;
 
     Vector2 camRotation;
 
@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour
         // Initialized components
         gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         myRB = GetComponent<Rigidbody>();
-        playerCam = Camera.main;
+        //playerCam = Camera.main;
         cameraHolder = transform.GetChild(0);
 
         // Camera setup
