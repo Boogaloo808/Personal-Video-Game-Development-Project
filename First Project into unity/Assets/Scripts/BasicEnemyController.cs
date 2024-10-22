@@ -2,11 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SceneManagement;
 
 public class BasicEnemyController : MonoBehaviour
 {
-    public Camera enemyCam;
     public PlayerController player;
     public NavMeshAgent agent;
     public Transform target;
@@ -17,24 +15,27 @@ public class BasicEnemyController : MonoBehaviour
     public int damageGiven = 1;
     public int damageReceived = 1;
     public float pushBackForce = 5;
+    public float distanceDetection = 5;
 
-    [Header("Movement Stats")]
-    public bool sprinting = false;
-    public float speed = 10f;
-    public float sprintMult = 1.5f;
-    public float jumpHeight = 5f;
-    public float groundDetection = 1f;
 
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.Find("Player").GetComponent<PlayerController>();
         agent = GetComponent<NavMeshAgent>();
+
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        target = GameObject.Find("Player").transform;
+
+
+        agent.destination = target.position;
+
+
         if (health <= 0)
             Destroy(gameObject);
     }
@@ -46,7 +47,7 @@ public class BasicEnemyController : MonoBehaviour
             health -= damageReceived;
             Destroy(collision.gameObject);
         }
-        
+
         if (collision.gameObject.tag == "Player" && !player.takenDamage)
         {
             player.takenDamage = true;
@@ -55,15 +56,4 @@ public class BasicEnemyController : MonoBehaviour
             player.StartCoroutine("cooldownDamage");
         }
     }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.tag == "Player")
-        {
-            target = GameObject.Find("Player").transform;
-
-            agent.destination = target.position;
-        }
-    }
-    
 }
