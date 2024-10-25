@@ -12,6 +12,8 @@ TagManager:
   - weapon2
   - basicEnemy
   - GunSound
+  - crossHair
+  - ammoPickup
   layers:
   - Default
   - TransparentFX

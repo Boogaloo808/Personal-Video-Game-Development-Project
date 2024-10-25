@@ -14,12 +14,15 @@ public class PlayerController : MonoBehaviour
 
     Vector2 camRotation;
 
+    public GameObject crossHair;
+
     [Header("Player Stats")]
     public bool takenDamage = false;
     public float damangeCooldownTimer = .5f;
     public int health = 5;
     public int maxHealth = 10;
-    public int healtPickupAmt = 5;
+    public int healthPickupAmt = 5;
+    public int ammoPickupAmt = 20;
 
     [Header("Weapon Stats")]
     public AudioSource weaponSpeaker;
@@ -140,17 +143,20 @@ public class PlayerController : MonoBehaviour
     {
         if ((collision.gameObject.tag == "healthPickup") && health < maxHealth)
         {
-            if (health + healtPickupAmt > maxHealth)
+            if (health + healthPickupAmt > maxHealth)
                 health = maxHealth;
 
             else
-                health += healtPickupAmt;
+                health += healthPickupAmt;
 
             Destroy(collision.gameObject);
         }
 
         if ((collision.gameObject.tag == "ammoPickup") && currentAmmo < maxAmmo)
         {
+            if (currentAmmo + ammoPickupAmt > maxAmmo)
+                currentAmmo = maxAmmo;
+
             if (currentAmmo + reloadAmt > maxAmmo)
                 currentAmmo = maxAmmo;
 
@@ -165,6 +171,8 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.tag == "weapon")
         {
+            crossHair.SetActive(true);
+
             other.transform.SetPositionAndRotation(weaponSlot.position, weaponSlot.rotation);
 
             other.transform.SetParent(weaponSlot);
