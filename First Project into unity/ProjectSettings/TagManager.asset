@@ -11,8 +11,7 @@ TagManager:
   - weapon1
   - weapon2
   - basicEnemy
-  - Upgrade
-  - enemyCam
+  - GunSound
   layers:
   - Default
   - TransparentFX

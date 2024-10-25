@@ -55,6 +55,8 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        weaponSpeaker = GetComponent<AudioSource>();
+
         // Initialized components
         gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         myRB = GetComponent<Rigidbody>();
